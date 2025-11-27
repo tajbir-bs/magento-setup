@@ -1,0 +1,185 @@
+# ====================
+# Environment & Config
+# ====================
+.env
+.env.local
+.env.*.local
+*.local
+
+# ====================
+# IDE & Editor Files
+# ====================
+# JetBrains IDEs (PhpStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.buildpath
+.project
+.settings/
+.metadata/
+.cache/
+
+# NetBeans
+/nbproject/
+
+# ====================
+# OS Files
+# ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+.directory
+
+# ====================
+# Docker
+# ====================
+docker-compose.override.yml
+
+# ====================
+# Magento 2 Specific
+# ====================
+# Magento config files
+setup/app/etc/env.php
+setup/app/etc/config.php
+
+# Magento code directories
+setup/app/code/Magento/TestModule*
+setup/app/config_sandbox/
+
+# Build tools
+setup/node_modules/
+setup/.grunt/
+setup/Gruntfile.js
+setup/package.json
+setup/grunt-config.json
+
+# PHP CS Fixer
+setup/.php_cs
+setup/.php_cs.cache
+setup/.php-cs-fixer.php
+setup/.php-cs-fixer.cache
+
+# Magento generated files
+setup/generated/*
+!setup/generated/.htaccess
+
+setup/var/*
+!setup/var/.htaccess
+
+# Vendor directory (composer dependencies)
+setup/vendor/*
+!setup/vendor/.htaccess
+
+# Static content
+setup/pub/static/*
+!setup/pub/static/.htaccess
+
+# Media files
+setup/pub/media/*.*
+!setup/pub/media/.htaccess
+setup/pub/media/attribute/*
+!setup/pub/media/attribute/.htaccess
+setup/pub/media/analytics/*
+setup/pub/media/catalog/*
+!setup/pub/media/catalog/.htaccess
+setup/pub/media/customer/*
+!setup/pub/media/customer/.htaccess
+setup/pub/media/downloadable/*
+!setup/pub/media/downloadable/.htaccess
+setup/pub/media/favicon/*
+setup/pub/media/import/*
+!setup/pub/media/import/.htaccess
+setup/pub/media/logo/*
+setup/pub/media/custom_options/*
+!setup/pub/media/custom_options/.htaccess
+setup/pub/media/theme/*
+setup/pub/media/theme_customization/*
+!setup/pub/media/theme_customization/.htaccess
+setup/pub/media/wysiwyg/*
+!setup/pub/media/wysiwyg/.htaccess
+setup/pub/media/tmp/*
+!setup/pub/media/tmp/.htaccess
+setup/pub/media/captcha/*
+setup/pub/media/sitemap/*
+!setup/pub/media/sitemap/.htaccess
+
+# Sitemap files
+setup/robots.txt
+setup/pub/robots.txt
+setup/sitemap
+setup/sitemap.xml
+setup/pub/sitemap
+setup/pub/sitemap.xml
+
+# Git attributes
+setup/.gitattributes
+
+# Atlassian
+atlassian*
+
+# Flex (if used)
+setup/lib/internal/flex/uploader/.actionScriptProperties
+setup/lib/internal/flex/uploader/.flexProperties
+setup/lib/internal/flex/uploader/.project
+setup/lib/internal/flex/uploader/.settings
+setup/lib/internal/flex/varien/.actionScriptProperties
+setup/lib/internal/flex/varien/.flexLibProperties
+setup/lib/internal/flex/varien/.project
+setup/lib/internal/flex/varien/.settings
+
+# ====================
+# Logs
+# ====================
+setup/var/log/*
+*.log
+
+# ====================
+# Backup & Temp Files
+# ====================
+*.bak
+*.swp
+*.swo
+*~
+*.tmp
+*.cache
+.tmp/
+.cache/
+
+# ====================
+# Composer
+# ====================
+setup/composer.lock
+setup/auth.json
+
+# ====================
+# Security
+# ====================
+*.pem
+*.key
+*.crt
+*.p12
+
+# ====================
+# Database dumps
+# ====================
+*.sql
+*.sql.gz
+*.dump
+

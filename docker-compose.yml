@@ -1,0 +1,78 @@
+networks:
+    magento_network:
+        driver: bridge
+
+services:
+    m_web247:
+        image: stackmagephp/php82-nginx-ubuntu
+        container_name: m_web247
+        networks:
+          - magento_network
+        ports:
+          - "80:80"
+        volumes:
+          - ./setup:/var/www/html
+          - ./sites-available:/etc/nginx/sites-available
+          - ./cli/php.ini:/etc/php/8.2/cli/php.ini
+          - ./fpm/php.ini:/etc/php/8.2/fpm/php.ini
+          - ./init.sh:/init.sh
+        entrypoint: ["/bin/bash", "-c", "/init.sh && tail -f /dev/null"]
+        links:
+          - magento_ce_db247
+          - opensearch_247
+          - opensearch_dashboards_247
+        depends_on:
+          - magento_ce_db247
+          - opensearch_247
+          - opensearch_dashboards_247
+
+    magento_ce_db247:
+        image: mariadb:10.6
+        container_name: magento_ce_db247
+        networks:
+          - magento_network
+        ports:
+          - "3306:3306"
+        environment:
+          - MARIADB_ROOT_PASSWORD=root
+          - MARIADB_DATABASE=magento
+        volumes:
+          - magento_ce_db247_volume:/var/lib/mysql
+
+    opensearch_247:
+        image: opensearchproject/opensearch:2.12.0
+        container_name: opensearch_247
+        networks:
+          - magento_network
+        environment:
+            "discovery.type": "single-node"
+            OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+            DISABLE_SECURITY_PLUGIN: true
+        ulimits:
+          memlock:
+            soft: -1
+            hard: -1
+        volumes:
+          - opensearch_247_volume:/usr/share/opensearch/data
+        ports:
+          - "9200:9200"
+          - "9600:9600"
+
+    opensearch_dashboards_247:
+        image: opensearchproject/opensearch-dashboards:2.12.0
+        container_name: opensearch_dashboards_247
+        networks:
+          - magento_network
+        environment:
+          - OPENSEARCH_HOSTS=["http://opensearch_247:9200"]
+          - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+        ports:
+          - "5601:5601"
+        depends_on:
+          - opensearch_247
+
+volumes:
+    magento_ce_db247_volume:
+        driver: local
+    opensearch_247_volume:
+        driver: local
