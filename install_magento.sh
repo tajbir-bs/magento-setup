@@ -23,11 +23,22 @@ echo ""
 echo "Waiting for database to be ready..."
 sleep 5
 
-# Check if vendor directory exists
+# Check if vendor directory and autoload file exist
 echo "Checking if composer dependencies are installed..."
-if ! docker exec m_web247 test -d /var/www/html/vendor; then
-    echo "Installing composer dependencies..."
-    docker exec m_web247 bash -c "cd /var/www/html && composer install"
+if ! docker exec m_web247 test -f /var/www/html/vendor/autoload.php; then
+    echo "Composer dependencies not found. Installing..."
+    docker exec m_web247 bash -c "cd /var/www/html && composer install --no-interaction"
+
+    # Verify installation succeeded
+    if ! docker exec m_web247 test -f /var/www/html/vendor/autoload.php; then
+        echo "✗ Error: Composer install failed!"
+        echo "Running composer install with verbose output for debugging..."
+        docker exec m_web247 bash -c "cd /var/www/html && composer install -vvv"
+        exit 1
+    fi
+    echo "✓ Composer dependencies installed successfully!"
+else
+    echo "✓ Composer dependencies already installed. Skipping..."
 fi
 
 # Set proper permissions
@@ -39,6 +50,9 @@ if docker exec m_web247 test -f /var/www/html/app/etc/env.php; then
     echo "Magento appears to be already installed!"
     echo "Checking installation..."
     docker exec m_web247 bash -c "cd /var/www/html && bin/magento --version"
+    echo ""
+    echo "Reindexing all indexers..."
+    docker exec m_web247 bash -c "cd /var/www/html && bin/magento indexer:reindex"
     echo ""
     echo "If you want to reinstall, please delete app/etc/env.php and app/etc/config.php first"
     exit 0
@@ -65,12 +79,17 @@ docker exec m_web247 bash -c "cd /var/www/html && bin/magento setup:install \
   --opensearch-host=opensearch_247 \
   --opensearch-port=9200 \
   --opensearch-index-prefix=magento2 \
-  --opensearch-timeout=15"
+  --opensearch-timeout=15 \
+  --backend-frontname=admin"
 
 if [ $? -eq 0 ]; then
     echo ""
     echo "✓ Magento installation completed successfully!"
     echo ""
+
+    # Compile dependency injection (generate interceptor classes)
+    echo "Compiling dependency injection and generating code..."
+    docker exec m_web247 bash -c "cd /var/www/html && bin/magento setup:di:compile"
 
     # Deploy static content
     echo "Deploying static content..."
@@ -78,15 +97,19 @@ if [ $? -eq 0 ]; then
 
     # Set proper permissions again
     echo "Setting final permissions..."
-    docker exec m_web247 bash -c "chmod -R 777 /var/www/html"
-
-    # Flush cache
-    echo "Flushing cache..."
-    docker exec m_web247 bash -c "cd /var/www/html && bin/magento cache:flush"
+    docker exec m_web247 bash -c "chmod -R 777 /var/www/html/var /var/www/html/generated /var/www/html/pub/static"
 
     # Disable 2FA for admin (optional, for easier local development)
     echo "Disabling 2FA for admin (local development)..."
     docker exec m_web247 bash -c "cd /var/www/html && bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth"
+
+    # Reindex all indexers
+    echo "Reindexing all indexers..."
+    docker exec m_web247 bash -c "cd /var/www/html && bin/magento indexer:reindex"
+
+    # Flush cache
+    echo "Flushing cache..."
+    docker exec m_web247 bash -c "cd /var/www/html && bin/magento cache:flush"
 
     echo ""
     echo "================================"
@@ -107,4 +130,3 @@ else
     echo "Please check the error messages above."
     exit 1
 fi
-
